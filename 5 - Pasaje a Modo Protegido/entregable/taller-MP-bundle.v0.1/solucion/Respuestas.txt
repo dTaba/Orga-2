@@ -1,0 +1,65 @@
+5 - Pasaje a modo protegido
+
+1-
+
+El modo real es el modo en el que entra el procesador despues de un power-up o un reset,   provee el entorno de programacion del 8086, luego de esto siempre va a pasar al modo protegido, el cual es el modo nativo del procesador.
+
+El modo real trabaja por defecto en 16 bits y se puede direccionar hasta 1MB de memoria, no tiene proteccion de memoria ni niveles de privilegio, ademas de que sus modos de direccionamiento son mas limitados que en modo protegido.
+
+Las direcciones en modo real (20 bits) se forman con 2 componentes de 16 bits:
+
+Segmento: Valor de un registro de segmento (CS, DS, ES, SS) shifteado 4 bits a la izquierda
+Offset : Valor de un registro (AX, BX, CX, DX, SP, BP, SI y DI)
+
+Segmento : Offset
+0x12F3   : 0x4B27                   
+
+Segmmento x 16 + Offset = 0x12F30 + 0x4B27 = 0x17A57 = Direccion Fisica
+
+El modo protegido cuenta con 4GB de memoria disponible, 4 niveles de proteccion, rutinas de atencion con privilegios y un set de instrucciones que varia segun el nivel de privilegio. Paginacion solo esta disponible en este modo.
+
+
+2-
+
+Hay que hacer el pasaje a modo protegido ya que se cuenta con muy poca memoria, la memoria no esta protegida, no hay distintos privilegios de acceso ni admite la capacidad de ejecutar varias tareas al "mismo" tiempo o gestionar interrupciones de una manera avanzada.
+
+
+3- 
+
+LA GDT (Global Descriptor Table) es una estructura que como su nombre lo indica contiene descriptores, en este caso descriptores de segmento, que pueden ser de codigo, de datos o de estado de tarea. Para usar la misma los registros de segmento contienen un "segment selector", el cual es un valor que indexa la GDT, dandonos un descriptor de segmento.
+
+Los descriptores de segmento son entradas en la GDT de 8 bytes, que se arman de la siguiente manera:
+
+*Granularity -> Bit 23
+
+Determina el escalado del campo segment limit, si esta seteado, el segment limit se interpreta en unidades de a 4Kb, sino, se interpreta en unidades de a byte.
+
+*Segment Limit -> 15:00 && 19:16 -> 20 Bits
+
+Basicamente es el tamano del segmento, varia segun si la g esta activada o no. 
+
+Ademas si el segmento es expand up el offset de una direccion logica puede ir desde el 0 hasta el limite de segmento, sino tira general protection fault / stack fault exception. 
+
+Si es expand down, el offset puede ir desde el limite del segmento + 1 hasta FFFFFFFFH o FFFFH, dependiendo de la B FLAG(indica si el segmento es de 32 bits). Offsets menores iguales que el limite genera una excepcion de proteccion general/ stack fault exception.
+
+*Base Address Field -> 32 Bits
+
+Define donde esta el byte 0 del segmento dentro de los 4gb posibles, este valor deberia estar alineado a 16 bytes para maximizar performance.
+
+*Present
+
+Indica si el segmento esta en memoria o no.
+
+*DPL
+
+Especifica el nivel de privilegio del segmento, va de a 0 a 3, siendo 0 el mas privilegiado.
+
+*Segment
+
+Determina si es un descriptor de sistema (clear) o es de codigo o data (set). 
+
+*AVL
+
+Disponible para uso de software del sistema, suele ir en 0.
+
+4. Los bits 11,10,9,8 en 1010 respectivamente
