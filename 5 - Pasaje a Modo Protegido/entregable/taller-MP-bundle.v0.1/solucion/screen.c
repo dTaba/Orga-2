@@ -69,5 +69,26 @@ void screen_draw_box(uint32_t fInit, uint32_t cInit, uint32_t fSize,
   }
 }
 
+
+void screen_draw_text(uint32_t fInit, uint32_t cInit, char* c, uint8_t attr){
+    while(*c != '\0')
+        screen_draw_box(fInit, cInit++, 1, 1, *(c++), attr);
+}
+
+
+
 void screen_draw_layout(void) {
+    
+    screen_draw_box(0,0,50,80, ' ', 0);
+
+    char* integrantes[] = {"Francisco Pacio", "Diego Tabarez", "Agustin Campagna"};
+
+    for(uint8_t i = 0; i < sizeof(integrantes)/sizeof(char*); i++) {
+        uint32_t col = 0;
+
+        char* c = integrantes[i];
+
+        screen_draw_text(i, col++, c, 0xF);
+
+    }
 }
