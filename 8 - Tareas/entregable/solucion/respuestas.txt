@@ -1,0 +1,106 @@
+1 - 
+
+Nuevas estructuras: Va a hacer falta crear el directorio de paginas, y su tabla de paginas correspondiente.
+
+Cantidad de nuevas entradas en las estructuras ya definidas: Hay que agregar el tss descriptor a la gdt que guarda una foto del contexto de la ejecucion de la tarea. Cada tss tiene que tener su descriptor definido en la gdt.
+
+Registros a configurar: 
+
+Hay que configurar el task register que nos provee la base adress de la tss, el limite de esa tss (segment limit) y un selector para la gdt.
+
+El tr tiene un parte invisible que son la base adress y el limite de la tss, estos hacen de cache para que la ejecucion de tareas sea mas eficiente y no se tengan que ir a buscar estos valores a memoria.
+
+
+
+TSS
+Para inicializar la tss de una tarea, hay que definir un formato inicial. Los campos mas relevantes a completar son:
+
+1 - EIP
+2 - ESP, EBP, ESP0 (puntero al tope de pila de nivel 0)
+3 - Los selectores de segmento CS, DS, ES, FS, GS, SS, SS0 (selector de la pila de nivel 0)
+4 - El CR3 que va tener la paginacion asociada a la tarea. Cada tarea tendra asi su propio directorio de paginas.
+5 - EFLAGS en 0x00000202 para tener las interrupciones habilitadas.
+
+Descriptor TSS
+1 - Bit B (busy) indica si la tarea esta siendo ejecutada. Lo iniciamos en 0.
+2 - DPL, el nivel de privilegio que se precisa para acceder al segmento. Usamos el nivel 0 ya que solo el kernel puede cambiar tareas. 
+3 - El LIMIT es el tamano maximo de la TSS. 67h es el minimo requerido.
+4 - El BASE indica la direccion base de la TSS
+
+2 - 
+
+A qué llamamos cambio de contexto?
+Llamamos cambio de contexto a cuando el scheduler pide cambiar la tarea en ejecucion por otra. 
+
+¿Cuándo se produce?
+Esto se realiza en cada interrupcion de reloj.
+
+¿Qué efecto tiene sobre los registros del procesador?
+Los registros actuales del procesador corresponden al programa que venia siendo ejecutado. Para realizar el context switch, estos se guardan en sus respectivos TSS, y luego son pisados por los del TSS del siguiente programa a ejecutar.
+
+¿Que almacena el registro TR?
+Almacena en una parte invisible el base adress y limit de la que a su vez esta almacenado en la el descriptor presente en la GDT. Estos campos se utilizan a manera de cache. En la parte visible se encuentra el selector de la gdt, es decir la tarea que esta en ejecucion (16 bits)
+
+¿Cómo obtiene la información necesaria para ejecutar una tarea después de un cambio de contexto?
+Para esto utiliamos la operacion LTR que se encarga de cargar en el TR el selector de segmento de la GDT correspondiente al TSS descriptor. Tambien se encargar de completar la parte invisible de este registro, contemplando el Base address y el Segment limit.
+
+
+3 - 
+
+¿Qué consideraciones deberíamos tener para poder realizar el primer cambio de contexto? ¿Y cuáles cuando no tenemos tareas que ejecutar o se encuentran todas suspendidas?
+
+Tener definidos los descriptores de tss para la tarea idle y la tarea inicial en la gdt.
+
+Antes del primer cambio de contexto tendremos que haber cargado la tarea inicial al Task Register, esto mediante la instruccion LTR, que recibe como parametro un registro de 16 bits con el selector de la tarea en la GDT. Luego hay que saltar a la tarea idle, esto se hace haciendo jmp selector_tarea_idle:0 (el valor del offset es ignorado, podemos usar 0)
+
+Esto va a cambiar el TR apuntando a la tarea idle y producira el cambio de contexto.
+
+
+
+4 - El scheduler es un modulo de software que administra la ejecucion de tareas / procesos. Utiliza una politica o criterio para decir cual es la proxima tarea a ejecutar.
+
+5 - En un sistema de una unica CPU nos aseguramos de cambiar de tarea a menudo para poder simular una simultaneidad de ejecucion, cuando en realidad solo podemos ejecutar una unica tarea a la vez. En este caso, la frecuencia de cambio de tareas es una vez por cada interrupcion de reloj. 
+
+
+9 - ¿Por qué hace falta tener definida la pila de nivel 0 en la tss?
+
+Porque cada tarea tiene una pila distinta.
+
+11 - 
+
+call pic_finish1: avisa que ya se atendio la interrupcion de tarea
+call sched_next_task: se obtiene la proxima tarea disponible
+str cx : se mete el selector de la tarea actual en cx
+cmp ax, cx : se compara si : se compara la siguiente con la actual
+je .fin : si son la misma no hace nada
+mov word [sched_task_selector], ax
+jmp far [sched_task_offset] :  sino hace el salto a esa tarea
+
+Far jump—A jump to an instruction located in a different segment than the current code segment but at the same privilege level, sometimes referred to as an intersegment jump.
+
+en eip se guardo la direccion virtual absoluta de la linea que se estaba ejecutando de la tarea anterior antes de la interrupcion, asi que vuelve directamente a ejecutar donde se dejo
+
+12 - 
+
+a-
+    current = 5, MAX_TASKS = 7
+    6, 7, 0, 1, 2, 3, 4 /==/
+
+
+14 -
+    a- La funcion tss_gdt_entry_for_task crea la entrada de la GDT que describe el tss selector de la tarea que se le indique.
+    
+    b- El desplazamiento a la izquierda del gdt_id es debido a que sched_add_task recibe un selector, por lo que este corrimiento agrega 0 en las posiciones menos significativas, indicando que es un selector de GDT, y que el nivel de RPL es 0.
+
+15 -
+    a- Los mecanismos que utilizan para comunicarse con el kernel incluyen:
+        - Una syscall para dibujar el estado del juego en pantalla
+        - La memoria compartida en la que el kernel actualiza el estado del teclado, el id de la tarea, y el contador de ticks (r)
+        - La memoria compartida on-demand en donde las tareas escriben el puntaje de los jugadores (r/w)
+
+    b- Ni idea. Preguntar.
+
+16-
+    a- La tarea termina en un loop infinito porque, como antes se menciona, todas las tareas tienen que hacer algo. Si no hicieramos el loop infinito el EIP podria apuntar a pedazos de memoria indefinidos, o que ni siquiera sean codigo.
+
+    b[opcional]- Para evitar el loop infinito deberiamos crear un mecanismo que nos permita eliminar la tarea una vez terminada. Eliminarla contemplaria las entradas de la GDT, el listado de tareas del scheduler, y la memoria que le corresponda a esta tarea.
