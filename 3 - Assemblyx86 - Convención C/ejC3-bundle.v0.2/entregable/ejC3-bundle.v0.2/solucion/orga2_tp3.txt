@@ -1,0 +1,56 @@
+¿Qué entienden por convencion de llamada? 
+
+La convencion de llamada tiene que ver con toda una serie de pre y pos condiciones que han de cumplirse al llamar a una función. Esas condiciones incluyen de qué manera se ubican en memoria y en registros los parámetros y valores de retorno.  Tambien en ésta se definen cuales seran los registros volatiles y no volatiles.
+
+¿Cómo está definida en la ABI de System V para 64 y 32 bits?
+
+Para 32 bits todos los parametros de las funciones se almacenan en el stack. Éstos quedan alineados a 16 bytes.
+Luego, el RBP queda apuntando al RBP de la función llamadora, y el RSP disminuye en valor a medida que se utiliza espacio  en la pila para valores de variables.
+
+A diferencia de 32 bits, en 64 se define un orden de pasaje de parametros, los cuales siempre se almacenan en registro siempre en orden de izquierda a derecha. Los parametros que sean enteros y punteros se van a guardar en RDI, RSI, RDX, RCX, R8 Y R9. Y los de punto flotante desde XMM0 a XMM7. Todos los parametros restantes se guardaran en la pila, pusheandolos de derecha a izquierda. La pila sigue teniendo que estar alineada a 16 bytes.
+
+¿Quién toma la responsabilidad de asegurar que se cumple la convención de llamada en C?
+
+El compilador
+
+¿Quién toma la responsabilidad de asegurar que se cumple la convención de llamada en ASM?
+
+El pobre infeliz de turno (el programador)
+
+¿Qué es un stack frame?
+
+La región de la pila comprendida entre el primer parámetro pusheado a la pila y el RSP
+
+¿A qué se le suele decir prólogo y epı́logo?
+
+El pŕólogo es donde se reserva espacio en la pila para datos temporales, se agrega padding para mantenerla alineada a 16 bytes y se preserva los valores de los registros no volatiles.
+El epílogo es dibde restauramos los valores de los registros no volatiles y devolvemos a la pila a su estado inicial.
+
+¿Cuál es el mecanismo utilizado para almacenar variables temporales?
+
+Pushearlas al stack.
+
+¿A cuántos bytes es necesario alinear la pila si utilizamos funciones de libc?
+
+16 bytes.
+
+¿Si la pila está alienada a 16 bytes al realizarse una llamada función, cuál va a ser su alineamiento al ejecutar la primera instrucción de la función llamada?
+
+Va a estar alineada a 8 bytes porque previo a ejecutar un CALL estamos alineados a 16 bytes, y luego, al haber pusheado el RIP de la función llamadora, estaremos alineados a 8 bytes.
+
+f)
+	a. En este caso, como la función recibe unicamente un puntero a pixel_t no incurrimos en ningún error.
+
+	b. En el caso de estar en 32 bits al reordenar los parámetros cambiamos el orden en el que se los pushea al stack, al ser ambos de distinta longitud de bits la biblioteca va a leer los datos de manera erronea.
+	En 64 bits ya que según como estén ordenados será el orden que ocupen en RDI y RSI, la biblioteca en este caso leerá los parámetros al revés.
+
+	c. En el caso de 64 bits no se percibe ningún cambio ya que el valor de retorno es almacenado en el registro RAX. En el caso de 32 bits ni idea mostro.
+
+	d. En este caso en 64 bits tamos joya. En el caso de 32 van a quedar mal delimitados los demás parámetros.
+
+	e. En este caso quedan desordenados los parámetros pero al medir lo mismo en bits no incurrimos en ningún problema.
+
+Una vez analizados los casos especı́ficos describan la situación general: ¿Qué sucede si una función externa utilizada
+por nuestro programa 1 cambia su interfaz (parámetros o tipo devuelto) luego de una actualización? Se rompe todo al carajo y hay que recompilar
+
+Nos corrigio el checkpoint 1 NICO.
