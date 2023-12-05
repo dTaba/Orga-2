@@ -1,0 +1,57 @@
+
+1 -  El atributo de la PTE (page table entry) U/S indica si la pagina puede ser accedida por el espacio de usuarix (bit en 1) o solo supervisor/kernel (bit en 0).
+
+2 - Dada una dirección virtual, conseguimos la física aplicando los siguientes pasos:
+    (1) - Buscamos el CR3 (20 bits mas altos te dan la direccion del directorio de paginas, los otros son atributos, se ignoran)
+    (2) - Buscamos una entrada dentro del directorio de paginas
+    (3) - Decodificamos la Page Directory Entry (PDE)
+    (4) - Buscamos una entrada dentro de la Page Table (PT)
+    (5) - Decodificamos la Page Table Entry (PTE)
+    (6) - Habiéndo obtenido la página, buscamos la entrada de memoria que necesitamos según el Offset
+
+def virtual_to_physical(virtual_address):
+
+    pd_index = (virtualAddress >> 22)&0x3FF     // Índice de PD: 10 bits mas significativos
+    pt_index = (virtualAddress >> 12)&0x3FF     // Índice de PT: Segundos 10 bits mas significativos
+    page_offset = virtualAddress&0xFFF          // Offset desde el inicio de la página: 12 bits menos significativos
+    
+    pd = CR3&0xFFFFF000                         // Dirección de PD (limpiamos CR3)
+    pt = pd[pd_index]&0xFFFFF000                // Dirección de PT (limpiamos la PDE)
+    page_addr = pt[pt_index]&0xFFFFF000         // Dirección de la página (limpiamos la PTE)
+    physical_address = page_addr | page_offset  // Dirección física (sumamos la base de la página y el offset de virtual_address)
+    
+    return physical_address
+
+
+3 - Atributos tabla de pagina:
+
+D: (Dirty) es seteado por la unidad de memoria del procesador cuando se escribe a la pagina. Se limpia por soft.
+
+A: (Accessed) es seteado por unidad de memoria del procesador cuando se escribe o LEE en la pagina, se limpia por soft.
+
+PCD: (Cache disabled) hace que la pagina no se almacene en memoria rapida.
+
+PWT: (Write through) hace que al escribir la escritura se refleje en cache y memoria a la vez, sino solo se actualiza la memoria cuando se desaloja la linea de cache.
+
+U/S: Indica si la pagina puede ser accedida por el espacio de usuarix (bit en 1) o solo supervisor/kernel (bit en 0)
+
+R/W: indica si la pagina puede leerse y escribirse (bit en 1) o solo leerse (bit en 0).
+
+P: indica si la pagina se encuentra cargada en memoria o no.
+
+Cuando el U/S y R/W del directorio y de la  tabla de paginas difieren sucede que:
+    Si el U/S de ambos es Usuario (1), prevalece el R/W mas restrictivo.
+    Si el U/S de alguno es Supervisor (0), siempre resulta en un privilegio de Supervisor con permisos Read/Write.
+
+
+e - Suponiendo que el código de la tarea ocupa dos páginas y utilizaremos una página para la pila de la tarea. ¿Cuántas
+páginas hace falta pedir a la unidad de manejo de memoria para el directorio, tablas de páginas y la memoria de una
+tarea?
+
+En primer lugar el directorio de tablas es una pagina, ya que contiene 1024 entradas que ocupan 4 bytes c/u ( 1024 x 4 = 4kb = 1 pagina ). Luego necesitamos una tabla de paginas (tambien de 1024 entradas = 4kb) que tendra 3 entradas que nos llevaran a 3 paginas distintas, la de la pila de la tarea y las 2 del codigo de la tarea.
+
+Directorio (1 pagina 1024 * 4 bytes) + Tabla de paginas (1 Pagina 1024*4 bytes) + Paginas Requeridas por la tarea (3 paginas) = 5 Paginas
+
+G - TLB almacena las ultimas traducciones realizadas para no tener que volver a computarlas.
+Cuando realicemos un cambio en nuestras estructuras de paginacion es necesario forzar una limpieza del mismo para evitar que las direcciones pre-computadas que ya no son validas se sigan empleando, para esto realizamos un intercambio del registro CR3 con un valor temporal y luego lo restauramos. Los atributos que almacena son los de privilegio y r/w, donde checkea el mas restrictivo entre el page directory y la page table de donde sale
+
