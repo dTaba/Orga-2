@@ -1,0 +1,27 @@
+1-
+
+Interrupt gate - Cambian privilegio
+
+Una interrupt gate es uno de los tipos de descriptores de la IDT y se utiliza principalmente para manejar interrupciones generadas por hardware, como las interrupciones de dispositivos periféricos o las interrupciones de reloj. Cuando se produce una interrupcion o excepcion, la cpu guarda el estado actual y cambia al nivel de privilegio correspondiente antes de ejecutar la rutina de manejo de la interrupcion. Son apropiadas para interrupciones que requieren un cambio de nivel de privilegio. 
+
+Trap gate - No cambian privilegio
+
+Similar a las interrupt gates, pero no cambian el nivel de privilegio cuando se produce la transición a la rutina de manejo. Útiles cuando se desea manejar eventos sin cambiar el nivel de privilegio, como el seguimiento de depuración o el monitoreo de eventos específicos.
+
+Task gate - Administracion de tares (descontinuada)
+
+No se utilizan comúnmente en sistemas modernos y sistemas operativos, ya que la administración de tareas se realiza de manera diferente en la mayoría de los casos. Estos descriptores están relacionados con la administración de tareas y no se utilizan para manejar interrupciones o excepciones comunes.
+
+
+a-      Segsel: indica en que segmento de memoria coincidente con la gtd va a estar asociada la rutina de interrupcion
+        Type: Tipo de interrupcion
+        Dpl: Descriptor de privilegio
+        Segment present: indica si el segmento que contiene la rutina de manejo de la interrupcion está presente en memoria. (que coño pasa si no está en memoria???) 
+
+    El offset indica la distancia que hay entre el comienzo del segmento de memoria hasta donde comienza la rutina de interrupcion
+
+
+b- 
+
+7- El epílogo de interrupcion está conformado por la operación PUSHAD y el prólogo sería POPAD que se encargan de preservar todos los registros de propósito general. Utilizamos IRET en vez de RET ya que una interrumpción es llamada de manera lejana y por eso debemos popear algunos registros que fueron preservados al llamar a la función. "As with a real-address mode interrupt return, the IRET instruction pops the return instruction pointer, return code segment selector, and EFLAGS image from the stack to the EIP, CS, and EFLAGS registers, respectively, and then resumes execution of the interrupted program or procedure. If the return is to another privilege level, the IRET instruction also pops the stack pointer and SS from the stack, before resuming program execution. If the return is to virtual-8086 mode, the processor also pops the data segment registers from the stack."
+
