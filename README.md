@@ -4,7 +4,7 @@
 
 ### Primera Parte:
 
-Los tps 2 a 4 son ejercicios de assembler algunos cuyo objetivo es familiarizarse con este lenguaje y otros que resuelven problemas mas interesantes como lo es implementar un filtro de imagenes procesando los datos en paralelol (SIMD). Para correr los tests de estos ejercicios va a hacer falta tener instalado GCC, Valgrind y GDB / GDB Dashboard si se quiere debuggear.
+Los tps 2 a 4 son ejercicios de assembler algunos cuyo objetivo es familiarizarse con este lenguaje y otros que resuelven problemas mas interesantes como lo es implementar un filtro de imagenes procesando los datos en paralelo (SIMD). Para correr los tests de estos ejercicios va a hacer falta tener instalado GCC, Valgrind y GDB / GDB Dashboard si se quiere debuggear.
 
 GCC
 ```sh
@@ -24,7 +24,7 @@ pip install pygments
 ---
 ### Segunda Parte:
 
-Los tps 5 a 8 cubren un desarrollo incremental en el cual se desarrolla un pequeño sistema operativo. Tp a tp se van agregando funciones básicas de un sistema operativo como el manejo de tareas, los segmentos del sistema y sus atributos, la asignación de memoria por páginas de 4kb.
+Los tps 5 a 8 cubren un desarrollo incremental de un kernel el cual se encarga de manejar un pequeño sistema operativo. Tp a tp se van agregando funciones básicas de un sistema operativo como el manejo de tareas, los segmentos del sistema y sus atributos, la asignación de memoria por páginas de 4kb, etc.
 
 Para poder ejecutar estos trabajos se necesita instalar NASM y QEMU.
 
@@ -47,7 +47,7 @@ Resumen de contenidos vistos en la **primera parte** de la materia:
 Resumen de contenidos vistos en la **segunda parte** de la materia:
 
 - Lenguaje ensamblador x86 (32 bits)
-- Segmentación - GDT /LDT
+- Segmentación - GDT / LDT
 - Modo protegido vs modo real
 - Interrupciones (Internas, PIC, Excepciones)
 - Sistema de paginación (CR3, Direcciones virtuales)
