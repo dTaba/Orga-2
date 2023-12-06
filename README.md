@@ -65,6 +65,16 @@ Resumen de contenidos vistos en la **segunda parte** de la materia:
 |  Primera Parte | [apuntes/resumenPrimeraParte.odt][odt] |
 
 
+---
+### Recursos
+
+| Resumen | Links |
+| ------ | ------ |
+| GDB Cheatsheet | [recursos/gdb.md][gdb] |
+|  Guidelines C/ASM | [recursos/guidelinesBasicas.pdf][asm] |
+|  Registros | [recursos/registros.pdf][reg] |
+
+
 
 [Guia de uso]: <https://github.com/dTaba/Orga-2/blob/main/Recursos/GuiaQemu.pdf>
 [NASM]: <https://github.com/dTaba/Orga-2/blob/main/Recursos/nasm_2.16.01-1_amd64.deb>
@@ -73,3 +83,6 @@ Resumen de contenidos vistos en la **segunda parte** de la materia:
 [pag]: <https://github.com/dTaba/Orga-2/blob/main/Apuntes/7%20-%20Paginaci%C3%B3n.pdf>
 [tareas]: <https://github.com/dTaba/Orga-2/blob/main/Apuntes/8%20-%20Tareas.pdf>
 [odt]: <https://github.com/dTaba/Orga-2/blob/main/Apuntes/resumenPrimeraParte.odt>
+[gdb]: <https://github.com/dTaba/Orga-2/blob/main/Recursos/gdb.md>
+[asm]: <https://github.com/dTaba/Orga-2/blob/main/Recursos/guidelinesBasicas.pdf>
+[reg]: <https://github.com/dTaba/Orga-2/blob/main/Recursos/registros.png>
