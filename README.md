@@ -73,6 +73,9 @@ Resumen de contenidos vistos en la **segunda parte** de la materia:
 | GDB Cheatsheet | [recursos/gdb.md][gdb] |
 |  Guidelines C/ASM | [recursos/guidelinesBasicas.pdf][asm] |
 |  Registros | [recursos/registros.pdf][reg] |
+|  Pre-Parcial 2 | [recursos/Clase pre-parcial2.pdf][pre] |
+|  Selectores y Descriptores | [recursos/SelectoresDescriptoresEtc/][selec] |
+|  Parcial 1 rehecho| [recursos/parcial1Rehecho/][1rehecho] |
 
 
 
@@ -86,3 +89,6 @@ Resumen de contenidos vistos en la **segunda parte** de la materia:
 [gdb]: <https://github.com/dTaba/Orga-2/blob/main/Recursos/gdb.md>
 [asm]: <https://github.com/dTaba/Orga-2/blob/main/Recursos/guidelinesBasicas.pdf>
 [reg]: <https://github.com/dTaba/Orga-2/blob/main/Recursos/registros.png>
+[pre]: <https://github.com/dTaba/Orga-2/blob/main/Recursos/Clase%20pre-parcial2.pdf>
+[selec]: <https://github.com/dTaba/Orga-2/tree/main/Recursos/Selectores%2C%20Descriptores%2C%20etc>
+[1rehecho]: <https://github.com/dTaba/Orga-2/tree/main/Recursos/parcial1Rehecho>
